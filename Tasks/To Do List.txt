@@ -7,8 +7,11 @@ Tasks:
 		-Create a function that calculates lift and drag on the canards, fins, and rocket body
 		-Inputs: current velocity, altitude (to calculate air properties such as pressure, temp, density, etc.; 
 			zI-component of position?), canard angle of attack (?)
-		-Output: 3 x n vector containing the total aerodynamic force on each canard, fin, body 
+		-Output: 3 x 5 matrix containing the total aerodynamic force on each canard, body 
 			(each column represents the x, y, z components in the inertial frame); Note: Fcanard = sqrt(Lift^2 + Drag^2)
+	
+	Fmat = AeroCalc(inputs)
+
 	b. Thrust Calculator
 		-Create a fuction that outputs a matrix of thrust over the whole simulation time
 		-outputs to new substructure called S.thrustMat in the topSimulate.m script
@@ -19,6 +22,8 @@ Tasks:
 		-Outputs: (N-1) x 1 matrix of thrust force over the simulation time (assuming thrust only acts along the -x direction with respect to the rocket body (-xB))
 
 2. Moment Calculator
+
+
 
 
 3. Replace the quadrotor properties with rocket properties in quadParams.m
