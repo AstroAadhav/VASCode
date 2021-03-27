@@ -2,7 +2,7 @@ Tasks:
 
 1. Replace quadrotor dynamics with rocket dynamics in quadODEFunctionHF
 	Forces: Fsum = Fgravity + Faerodynamics + Fthrust + Fdisturbances
-		     = g*[0; 0; -1](inertial frame) + Faero + R_BI*ThrustMagnitude*[-1; 0; 0](body frame) + Fdist 
+		     = g*[0; 0; -1](inertial frame) + Faero + R_BI*ThrustMagnitude*[1; 0; 0](body frame) + Fdist 
 	a. Aerodynamics Calculator
 		-Create a function that calculates lift and drag on the canards, fins, and rocket body
 		-Inputs: current velocity, altitude (to calculate air properties such as pressure, temp, density, etc.; 

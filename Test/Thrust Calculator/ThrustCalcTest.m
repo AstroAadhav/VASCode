@@ -23,12 +23,12 @@ hold off
 % xticks([0:0.5:6.5])
 
 %Calculating impulse to compare to original thrust curve
-% Impulse = 0;
-% Impulse = area under thrust curve [N*s]
-% for i = 1:length(Tcurve)-1
-%     %Trapezoidal Area
-%     base1 = Tcurve(i+1,2);
-%     base2 = Tcurve(i,2);
-%     height = Tcurve(i+1,1) - Tcurve(i,1);
-%     Impulse = Impulse + 0.5*(base1 + base2)*height;
-% end
+Impulse = 0;
+%Impulse = area under thrust curve [N*s]
+for i = 1:length(Tcurve)-1
+    %Trapezoidal Area
+    base1 = Tcurve(i+1,2);
+    base2 = Tcurve(i,2);
+    height = Tcurve(i+1,1) - Tcurve(i,1);
+    Impulse = Impulse + 0.5*(base1 + base2)*height;
+end
