@@ -120,8 +120,8 @@ XMat = []; tVec = [];
 for kk=1:N-1
   % Simulate measurements
   statek.rI = Xk(1:3);
-  statek.RBI(:) = Xk(7:15);
   statek.vI = Xk(4:6);
+  statek.RBI(:) = Xk(7:15);
   statek.omegaB = Xk(16:18);
   statek.aI = Xdotk(4:6);
   statek.omegaBdot = Xdotk(16:18);

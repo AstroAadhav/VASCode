@@ -3,7 +3,7 @@
 % Loads quadrotor parameters into the structure quadParams
 
 % kF(i) is the rotor thrust constant for the ith rotor, in N/(rad/s)^2
-quadParams.kF = 6.11e-8*(0.104719755)^-2*ones(4,1); 
+quadParams.kF = 6.11e-8*(0.104719755)^-2*ones(4,1);
 % kN(i) is the rotor counter-torque constant for the ith rotor, in N-m/(rad/s)^2
 quadParams.kN = 1.5e-9*(0.104719755)^-2*ones(4,1); 
 % omegaRdir(i) indicates the ith rotor spin direction: 1 for a rotor angular
