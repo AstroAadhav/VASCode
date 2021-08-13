@@ -19,6 +19,7 @@ quadParams.rotor_loc  =  ...
     0.21*[ 1  1 -1 -1; ... 
           -1  1  1 -1; ...
            0  0  0  0];
+       
 % Mass of the quad, in kg
 quadParams.m = 25;%0.78;
 % The quad's moment of inertia, expressed in the body frame, in kg-m^2
@@ -31,6 +32,7 @@ quadParams.Cd = readmatrix('CA_avg.txt');
 quadParams.Cnfit = readmatrix('CN_fit.txt');
 % The quad's static margin (distance from cp to cg) in m
 quadParams.StaticMargin = 0.13325;
+
 % taum(i) is the time constant of the ith rotor, in seconds. This governs how
 % quickly the rotor responds to input voltage.
 quadParams.taum = (1/20)*ones(4,1);

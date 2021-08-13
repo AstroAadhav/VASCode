@@ -1,21 +1,10 @@
-% Top-level script for calling simulateQuadrotorControl or
-% simulateQuadrotorEstimationAndControl
+% Top-level script for calling simulateQuadrotorControl
 
 % 'clear all' is needed to clear out persistent variables from run to run
 clear all; clc;
-% Seed Matlab's random number: this allows you to simulate with the same noise
-% every time (by setting a nonnegative integer seed as argument to rng) or
-% simulate with a different noise realization every time (by setting
-% 'shuffle' as argument to rng).
-% nseed = 131313;
-% S.Seed = rng(nseed);
 tic
-% S.Seed
-% Assert this flag to call the full estimation and control simulator;
-% otherwise, only the control simulator is called
-estimationFlag = 0;
 % Total simulation time, in seconds
-Tsim = 20;
+Tsim = 25;
 % Update interval, in seconds
 delt = 0.005;
 % Time vector, in seconds 
@@ -42,9 +31,9 @@ pitch = 0*(pi/180);
 yaw = 0*(pi/180);
 S.state0.e = [0 -pi/2+pitch -pi/2+yaw]';
 % Initial velocity of body with respect to I, expressed in I, in m/s
-S.state0.v = [0 0 400]';
+S.state0.v = [10 0 400]';
 % Initial angular rate of body with respect to I, expressed in B, in rad/s
-S.state0.omegaB = [5 0 0]';
+S.state0.omegaB = [0 0 0]';
 % Oversampling factor
 S.oversampFact = 2;
 % Feature locations in the I frame
@@ -57,11 +46,9 @@ P.quadParams = quadParams;
 P.constants = constants; 
 P.sensorParams = sensorParams;
 
-if(estimationFlag)
-  Q = simulateQuadrotorEstimationAndControl(R,S,P);
-else
-  Q = simulateQuadrotorControl(R,S,P);
-end
+%Run simulation with the inital conditions above
+Q = simulateQuadrotorControl(R,S,P);
+
 toc
 % S2.tVec = Q.tVec;
 % S2.rMat = Q.state.rMat;

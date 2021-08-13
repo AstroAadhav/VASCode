@@ -94,22 +94,20 @@ else
     Cnfit = P.quadParams.Cnfit(1,2:end);
 end
 %Determine pitch and yaw to calculate Cn from the fit
-
+vBu = RBI*vIu;
+yaw = atan2(vBu(2), vBu(1));
+pitch = atan2(vBu(3), sqrt(vBu(1)^2 + vBu(2)^2));
+Cn = polyval(Cnfit, abs([0;pitch;yaw]));
 
 % Calculate aerodynamic forces
 epsilon_vI = 1e-3;
 da = 0; dn = 0; dP = 0; vIu = [0;0;1]; %axial force, normal force, dynamic pressure, inertial velocity unit vector
-vBu = [1;0;0]; yaw = 0; pitch = 0; Cn = 0; dn = 0;
 if(norm(vI) > epsilon_vI)
   vIu = vI/norm(vI);
   fd = (xI'*vIu)*norm(vI)^2;
   dP = 0.5*P.quadParams.Ad*rho*fd;
   da = dP*Cd;
-  vBu = RBI*vIu;
-  yaw = atan2(vBu(2), vBu(1));
-  pitch = atan2(vBu(3), sqrt(vBu(1)^2 + vBu(2)^2));
-  Cn = polyval(Cnfit, abs([0;pitch;yaw]));
-  dn = dP*Cn.*[0;pitch;yaw];
+  dn = dP*Cn*[0;pitch;yaw];
 end
 
 % Test = sqrt(0.5*rho*P.quadParams.Ad*Cn)*(P.quadParams.StaticMargin^1.5)
@@ -117,7 +115,7 @@ end
 % Find derivatives of state elements
 rIdot = vI;
 % vIdot = ([0;0;-mq*gE] + RBI'*sum(FMat,2) + RBI'*distVec - da*vIu)/mq;
-vIdot = ([0;0;-mq*gE] + RBI'*sum(FMat,2) + RBI'*distVec - RBI'*([da;0;0]+dn))/mq;
+vIdot = ([0;0;-mq*gE] + RBI'*sum(FMat,2) + RBI'*distVec - RBI'*([da;0;0]))/mq;
 RBIdot = -omegaBx*RBI;
 NB = sum(NMat,2);
 
