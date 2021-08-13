@@ -20,13 +20,17 @@ quadParams.rotor_loc  =  ...
           -1  1  1 -1; ...
            0  0  0  0];
 % Mass of the quad, in kg
-quadParams.m = 0.78;
+quadParams.m = 25;%0.78;
 % The quad's moment of inertia, expressed in the body frame, in kg-m^2
-quadParams.Jq = diag(1e-9*[1756500; 3572300; 4713400]);
+quadParams.Jq = diag(1e-9*[75304350; 76844293937; 76844293929]);
 % The circular-disk-equivalent area of the quad's body, in m^2
-quadParams.Ad = 0.01;
-% The quad's coefficient of drag (unitless)
-quadParams.Cd = 0.3;
+quadParams.Ad = 0.008385;
+% The quad's coefficient of axial force at Mach 0.01:2.09 (unitless)
+quadParams.Cd = readmatrix('CA_avg.txt');
+% The quad's coefficient of normal force at Mach 0.01:2.09 (unitless)
+quadParams.Cnfit = readmatrix('CN_fit.txt');
+% The quad's static margin (distance from cp to cg) in m
+quadParams.StaticMargin = 0.13325;
 % taum(i) is the time constant of the ith rotor, in seconds. This governs how
 % quickly the rotor responds to input voltage.
 quadParams.taum = (1/20)*ones(4,1);

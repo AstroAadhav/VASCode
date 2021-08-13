@@ -55,8 +55,8 @@ function [Fk,zIstark] = trajectoryController(R,S,P)
 %+==============================================================================+  
 
 % Set control gains
-kC = 4;
-kdC = 3;
+kC = 0;
+kdC = 0;
 
 % Assign some local variables for convenience
 mq = P.quadParams.m;
@@ -73,7 +73,7 @@ FIstark = kC*er + kdC*erdot + [0;0;mq*gE] + mq*R.aIstark;
 zIstark = FIstark/norm(FIstark);
 
 % Get desired total thrust
-Fk = FIstark'*S.statek.RBI'*[0;0;1];
+Fk = 0*FIstark'*S.statek.RBI'*[0;0;1];
 
 
 

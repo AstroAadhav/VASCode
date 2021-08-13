@@ -62,7 +62,7 @@ a = cross(b,R.zIstark);
 RBIstar = [a,b,R.zIstark]';
 RE = RBIstar*(S.statek.RBI');
 eE = [RE(2,3) - RE(3,2); RE(3,1) - RE(1,3); RE(1,2) - RE(2,1)];
-NBk = KC*eE - KdC*omegaB + omegaBx*P.quadParams.Jq*omegaB;
+NBk = [0 0 0]';%KC*eE - KdC*omegaB + omegaBx*P.quadParams.Jq*omegaB;
 
 
 

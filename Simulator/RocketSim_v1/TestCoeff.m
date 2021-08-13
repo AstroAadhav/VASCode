@@ -30,51 +30,65 @@ CNV = [DataCell{1}(:,1), DataCell{1}(:,11), DataCell{2}(:,11), DataCell{3}(:,11)
 %   decreases linearly to below the constant value
 %   Use CNB for now 
 
-
-
-% %(0.5*rho*A*v^2)
+alpha2 = alpha*(pi/180);
+x = linspace(0, 10*(pi/180), 10*2);
+% Nfit = [Mach #, a, b]
+% CN = a*(angle of attack in rad) + b
+polydeg = 2;
+CNfit = [CNB(:,1), zeros(length(CNB), polydeg+1)];
 figure(1)
 hold on
-plot(CNB(:,1), CNB(:,2), '-r')
-plot(CNB(:,1), CNB(:,3), '-b')
-plot(CNB(:,1), CNB(:,4), '-g')
+for i = 1:length(CNB)
+CNfit(i,2:end) = polyfit(alpha2, CNB(i,2:4)', polydeg);
+plot(x, polyval(CNfit(i,2:end), x))
+end
 hold off
 grid on; box on
-xlim([0 2])
-title('C_N vs M')
-xlabel('Mach Number (M)')
-ylabel('Coefficient of Normal Force (C_N)')
-legend('\alpha = 0^o', '\alpha = 2^o', '\alpha = 4^o', 'location', 'east')
+fileID = fopen('CN_fit.txt','w');
+% fprintf(fileID,'%6s %12s\n','x','exp(x)');
+for i = 1:length(CNfit)
+fprintf(fileID,'%6f %12f %12f %12f\n',CNfit(i,:));
+end
+fclose(fileID);
 
+%(0.5*rho*A*v^2)
+% % figure(1)
+% % hold on
+% % plot(CNB(:,1), CNB(:,2), '-r')
+% % plot(CNB(:,1), CNB(:,3), '-b')
+% % plot(CNB(:,1), CNB(:,4), '-g')
+% % hold off
+% % grid on; box on
+% % xlim([0 2])
+% % title('C_N vs M')
+% % xlabel('Mach Number (M)')
+% % ylabel('Coefficient of Normal Force (C_N)')
+% % legend('\alpha = 0^o', '\alpha = 2^o', '\alpha = 4^o', 'location', 'east')
 
-% figure(3)
+% figure(4)
 % hold on
-% plot(CNV(:,1), CNV(:,2), '-r')
-% plot(CNV(:,1), CNV(:,3), '-b')
-% plot(CNV(:,1), CNV(:,4), '-g')
+% plot(CAOn(:,1), CAOn(:,2), '-r')
+% plot(CAOn(:,1), CAOn(:,3), '--b')
+% plot(CAOn(:,1), CAOn(:,4), 'xg')
 % hold off
 % grid on; box on
-
-% figure(3)
-% hold on
-% plot(DataCell{1}(:,1), DataCell{1}(:,7)./DataCell{1}(:,7), '-r')
-% plot(DataCell{2}(:,1), DataCell{2}(:,7)./DataCell{1}(:,7), '--b')
-% plot(DataCell{3}(:,1), DataCell{3}(:,7)./DataCell{1}(:,7), 'xg')
-% hold off
-% grid on; box on
-% title('C_N vs M')
+% xlim([0 2])
+% title('C_A vs M')
 % xlabel('Mach Number (M)')
-% ylabel('Coefficient of Normal Force (C_N)')
+% ylabel('Coefficient of Axial Force (C_A)')
+% legend('\alpha = 0^o', '\alpha = 2^o', '\alpha = 4^o', 'location', 'southeast')
 
-figure(4)
-hold on
-plot(CAOn(:,1), CAOn(:,2), '-r')
-plot(CAOn(:,1), CAOn(:,3), '--b')
-plot(CAOn(:,1), CAOn(:,4), 'xg')
-hold off
-grid on; box on
-xlim([0 2])
-title('C_A vs M')
-xlabel('Mach Number (M)')
-ylabel('Coefficient of Axial Force (C_A)')
-legend('\alpha = 0^o', '\alpha = 2^o', '\alpha = 4^o', 'location', 'southeast')
+% CAAvg = [CAOn(:,1), mean(CAOn(:,2:end), 2)];
+% fileID = fopen('CA_avg.txt','w');
+% % fprintf(fileID,'%6s %12s\n','x','exp(x)');
+% for i = 1:length(CAAvg)
+% fprintf(fileID,'%6f %12f\n',CAAvg(i,:));
+% end
+% fclose(fileID);
+
+%Interpolate 0-4 deg angle of attack for Cn
+
+% CAtest = readmatrix('CA_avg.txt');
+% mach = 1.415;
+% row = find(abs(mach-CAtest(:,1))<0.005);
+% CD = CAtest(abs(mach-CAtest(:,1))<0.005, 2);

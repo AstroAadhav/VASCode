@@ -68,25 +68,60 @@ mq = P.quadParams.m;
 gE = P.constants.g;
 Jq = P.quadParams.Jq;
 omegaBx = crossProductEquivalent(omegaB);
-zI = RBI(3,:)';
+xI = RBI(1,:)'; %body x-axis, expressed in inertial coordinates
 
-% Calculate drag coefficient
+% Determine density and speed o sound
+[rho,~,a] = calcAtmoProp(X(3)/P.constants.distConv);
+rho = rho*P.constants.denConv; %Convert density from imperial to SI
+a = a*P.constants.distConv; %Convert speed from imperial to SI
+
+% Determine CD from simulation data based on Mach number
+mach = abs(norm(vI)/a);
+if and(mach>0.01, mach<2.09)
+    Cd = P.quadParams.Cd(abs(mach-P.quadParams.Cd(:,1))<0.005,2);
+elseif mach>2.09
+    Cd = P.quadParams.Cd(end,2);
+elseif mach<0.01
+    Cd = P.quadParams.Cd(1,2);
+end
+
+% Determine CD 2nd order polynomial fit from sim data based on Mach Number
+if and(mach>0.01, mach<2.09)
+    Cnfit = P.quadParams.Cnfit(abs(mach-P.quadParams.Cnfit(:,1))<0.005,2:end);
+elseif mach>2.09
+    Cnfit = P.quadParams.Cnfit(end,2:end);
+elseif mach<0.01
+    Cnfit = P.quadParams.Cnfit(1,2:end);
+end
+
+% Calculate aerodynamic forces
 epsilon_vI = 1e-3;
-da = 0; vIu = [1;0;0];
+da = 0; dn = 0; dP = 0; vIu = [0;0;1]; %axial force, normal force, dynamic pressure, inertial velocity unit vector
 if(norm(vI) > epsilon_vI)
   vIu = vI/norm(vI);
-  fd = (zI'*vIu)*norm(vI)^2;
-  da = 0.5*P.quadParams.Cd*P.quadParams.Ad*P.constants.rho*fd;
+  fd = (xI'*vIu)*norm(vI)^2;
+  dP = 0.5*P.quadParams.Ad*rho*fd;
+  da = dP*Cd;
 end
-
+vBu = RBI*vIu;
+yaw = atan2(vBu(2), vBu(1));
+pitch = atan2(vBu(3), sqrt(vBu(1)^2 + vBu(2)^2));
+Cn = polyval(Cnfit, abs([0;pitch;yaw]));
+% Test = sqrt(0.5*rho*P.quadParams.Ad*Cn)*(P.quadParams.StaticMargin^1.5)
 % Find derivatives of state elements
 rIdot = vI;
-vIdot = ([0;0;-mq*gE] + RBI'*sum(FMat,2) + distVec - da*vIu)/mq;
+% vIdot = ([0;0;-mq*gE] + RBI'*sum(FMat,2) + RBI'*distVec - da*vIu)/mq;
+vIdot = ([0;0;-mq*gE] + RBI'*sum(FMat,2) + RBI'*distVec - RBI'*([da;0;0]))/mq;
 RBIdot = -omegaBx*RBI;
 NB = sum(NMat,2);
-for ii=1:4
-  NB = NB + cross(P.quadParams.rotor_loc(:,ii),FMat(:,ii));
-end
+
+% Corrective Moment
+NBc = -(0.5*P.quadParams.Ad*rho*norm(vI)^2)*P.quadParams.StaticMargin*[0;pitch;yaw].*Cn;
+% % Damping Moment
+NBd = -(0.5*P.quadParams.Ad*rho*norm(vI)).*Cn*(P.quadParams.StaticMargin^2).*omegaB.*[0;1;1];
+% Total Moment
+NB = NB + NBc + NBd;
+
 omegaBdot = inv(Jq)*(NB - omegaBx*Jq*omegaB);
 omegaVecdot = (eaVec.*P.quadParams.cm - omegaVec)./P.quadParams.taum;
 
