@@ -33,7 +33,7 @@ S.state0.e = [0 -pi/2+pitch -pi/2+yaw]';
 % Initial velocity of body with respect to I, expressed in I, in m/s
 S.state0.v = [10 0 400]';
 % Initial angular rate of body with respect to I, expressed in B, in rad/s
-S.state0.omegaB = [0 0 0]';
+S.state0.omegaB = [5 0 0]';
 % Oversampling factor
 S.oversampFact = 2;
 % Feature locations in the I frame
