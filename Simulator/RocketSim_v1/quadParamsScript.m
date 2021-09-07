@@ -20,18 +20,32 @@ quadParams.rotor_loc  =  ...
           -1  1  1 -1; ...
            0  0  0  0];
        
+%%Rocket Parameters%%     
 % Mass of the quad, in kg
 quadParams.m = 25;%0.78;
 % The quad's moment of inertia, expressed in the body frame, in kg-m^2
-quadParams.Jq = diag(1e-9*[75304350; 76844293937; 76844293929]);
+% quadParams.Jq = diag(1e-9*[75304350; 76844293937; 76844293929]); From
+% mass properties given in Teams
+quadParams.Jq = diag(1e-7*[334841.56; 123437064.31; 123437064.31]); % From SolidWorks, assuming 25km mass evenly dist.
 % The circular-disk-equivalent area of the quad's body, in m^2
-quadParams.Ad = 0.008385;
+quadParams.Ad = 0.0083853114; %2.034in diameter
 % The quad's coefficient of axial force at Mach 0.01:2.09 (unitless)
 quadParams.Cd = readmatrix('CA_avg.txt');
 % The quad's coefficient of normal force at Mach 0.01:2.09 (unitless)
 quadParams.Cnfit = readmatrix('CN_fit.txt');
 % The quad's static margin (distance from cp to cg) in m
 quadParams.StaticMargin = 0.13325;
+
+%%Canard Parameters%%
+% Canard axial coefficient
+quadParams.Cdc = 0;
+% Canard normal coefficient
+quadParams.Cnc = 0;
+% Canard reference area, in m^2
+quadParams.Adc = 0.000731595; % 1.1339745 in^2, canard planform area
+% Canard static margin, in m
+quadParams.SMc = 0.881634; %34.71 in canard connection distance from cg
+
 
 % taum(i) is the time constant of the ith rotor, in seconds. This governs how
 % quickly the rotor responds to input voltage.

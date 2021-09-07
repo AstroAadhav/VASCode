@@ -34,7 +34,7 @@ alpha2 = alpha*(pi/180);
 x = linspace(0, 10*(pi/180), 10*2);
 % Nfit = [Mach #, a, b]
 % CN = a*(angle of attack in rad) + b
-polydeg = 2;
+polydeg = 1;
 CNfit = [CNB(:,1), zeros(length(CNB), polydeg+1)];
 figure(1)
 hold on
@@ -47,7 +47,7 @@ grid on; box on
 fileID = fopen('CN_fit.txt','w');
 % fprintf(fileID,'%6s %12s\n','x','exp(x)');
 for i = 1:length(CNfit)
-fprintf(fileID,'%6f %12f %12f %12f\n',CNfit(i,:));
+fprintf(fileID,'%6f %12f %12f\n',CNfit(i,:));
 end
 fclose(fileID);
 

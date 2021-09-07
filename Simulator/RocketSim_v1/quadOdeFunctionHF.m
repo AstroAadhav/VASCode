@@ -109,9 +109,15 @@ if(norm(vI) > epsilon_vI)
   yaw = atan2(vBu(2), vBu(1));
   pitch = atan2(vBu(3), sqrt(vBu(1)^2 + vBu(2)^2));
   Cn = polyval(Cnfit, abs([0;pitch;yaw]));
-  dn = dP*Cn.*[0;pitch;yaw];
+  for i = 1:3
+      if Cn(i)<0
+          Cn(i)=0;
+      end
+  end
+  dn = dP*Cn.*[0;pitch;-yaw];
 end
-
+% yawd = yaw*(180/pi)
+% pitchd = pitch*(180/pi)
 % Test = sqrt(0.5*rho*P.quadParams.Ad*Cn)*(P.quadParams.StaticMargin^1.5)
 
 % Find derivatives of state elements
@@ -123,10 +129,21 @@ NB = sum(NMat,2);
 
 % Corrective Moment
 NBc = -(dn)*P.quadParams.StaticMargin;
-% % Damping Moment
+% Damping Moment
 NBd = -(0.5*P.quadParams.Ad*rho*norm(vI)).*Cn*(P.quadParams.StaticMargin^2).*omegaB.*[0;1;1];
 % Total Moment
 NB = NB + NBc + NBd;
+
+% Error
+zIstark = [0;1;0];
+xIstark = [0;0;1];
+b = cross(zIstark,xIstark);
+b = b/norm(b);
+a = cross(b,zIstark);
+RBIstar = [a,b,zIstark]';
+RE = RBIstar*(RBI');
+eE = [RE(2,3) - RE(3,2); RE(3,1) - RE(1,3); RE(1,2) - RE(2,1)];
+
 
 omegaBdot = inv(Jq)*(NB - omegaBx*Jq*omegaB);
 omegaVecdot = (eaVec.*P.quadParams.cm - omegaVec)./P.quadParams.taum;

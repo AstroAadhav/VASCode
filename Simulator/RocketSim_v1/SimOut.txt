@@ -1,3 +1,3 @@
-Time to Apogee =     24.995000   [s]
-        Apogee =  16686.036824   [m]
-  Max Velocity =   1312.745999  [m/s]
+Time to Apogee =     19.995000   [s]
+        Apogee =  15949.549473   [m]
+  Max Velocity =   1394.453447  [m/s]

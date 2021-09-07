@@ -4,7 +4,7 @@
 clear all; clc;
 tic
 % Total simulation time, in seconds
-Tsim = 25;
+Tsim = 20;
 % Update interval, in seconds
 delt = 0.005;
 % Time vector, in seconds 
@@ -31,9 +31,9 @@ pitch = 0*(pi/180);
 yaw = 0*(pi/180);
 S.state0.e = [0 -pi/2+pitch -pi/2+yaw]';
 % Initial velocity of body with respect to I, expressed in I, in m/s
-S.state0.v = [10 0 400]';
+S.state0.v = [5 0 425]';
 % Initial angular rate of body with respect to I, expressed in B, in rad/s
-S.state0.omegaB = [5 0 0]';
+S.state0.omegaB = [0 0 0]';
 % Oversampling factor
 S.oversampFact = 2;
 % Feature locations in the I frame
@@ -69,7 +69,8 @@ title('Vertical position of CM');
 figure(3)
 plot3(Q.state.rMat(:,1),Q.state.rMat(:,2),Q.state.rMat(:,3))
 box on; grid on
-
+xlim([-100 100])
+ylim([-100 100])
 % figure(3);clf;
 % psiError = unwrap(n*Q.tVec + pi - Q.state.eMat(:,3));
 % meanPsiErrorInt = round(mean(psiError)/2/pi);
