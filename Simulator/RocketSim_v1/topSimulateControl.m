@@ -4,7 +4,7 @@
 clear all; clc;
 tic
 % Total simulation time, in seconds
-Tsim = 20;
+Tsim = 13.69;
 % Update interval, in seconds
 delt = 0.005;
 % Time vector, in seconds 
@@ -33,7 +33,7 @@ S.state0.e = [0 -pi/2+pitch -pi/2+yaw]';
 % Initial velocity of body with respect to I, expressed in I, in m/s
 S.state0.v = [0 0 425]';
 % Initial angular rate of body with respect to I, expressed in B, in rad/s
-S.state0.omegaB = [0 5 0]';
+S.state0.omegaB = [0 1 0]';
 % Oversampling factor
 S.oversampFact = 2;
 % Feature locations in the I frame
@@ -48,16 +48,7 @@ P.sensorParams = sensorParams;
 
 %Run simulation with the inital conditions above
 Q = simulateQuadrotorControl(R,S,P);
-
 toc
-% S2.tVec = Q.tVec;
-% S2.rMat = Q.state.rMat;
-% S2.eMat = Q.state.eMat;
-% S2.plotFrequency = 20;
-% S2.makeGifFlag = false;
-% S2.gifFileName = 'testGif.gif';
-% S2.bounds=2.5*[-1 1 -1 1 -0.1 1];
-% visualizeQuad(S2);
 
 %Plot Altitude
 figure(2);clf;
@@ -75,14 +66,6 @@ ymax = max(max(abs(Q.state.rMat(:,2))), 100);
 graphmax = sqrt(xmax^2 + ymax^2);
 xlim([-graphmax graphmax])
 ylim([-graphmax graphmax])
-% figure(3);clf;
-% psiError = unwrap(n*Q.tVec + pi - Q.state.eMat(:,3));
-% meanPsiErrorInt = round(mean(psiError)/2/pi);
-% plot(Q.tVec,psiError - meanPsiErrorInt*2*pi);
-% grid on;
-% xlabel('Time (sec)');
-% ylabel('\Delta \psi (rad)');
-% title('Yaw angle error');
 
 %Plot Euler Angles
 figure(4)
@@ -96,36 +79,6 @@ subplot(3,1,3)
 plot(Q.tVec,Q.state.eMat(:,3) + pi/2); grid on; box on;
 ylabel('Body X')
 
-%Body-Axis Visualization
-for i = 1:length(Q.state.eMat)
-RBI = euler2dcm(Q.state.eMat(i,:));
-Viz.x(i,:) = RBI(1,:);
-Viz.y(i,:) = RBI(2,:);
-Viz.z(i,:) = RBI(3,:);
-end
-figure(5)
-% x-axis = red, y-axis = blue, z-axis = green
-h1 = plot3([0 Viz.x(1,1)], [0 Viz.x(1,2)], [0 Viz.x(1,3)], 'r');
-hold on
-h2 = plot3([0 Viz.y(1,1)], [0 Viz.y(1,2)], [0 Viz.y(1,3)], 'b');
-h3 = plot3([0 Viz.z(1,1)], [0 Viz.z(1,2)], [0 Viz.z(1,3)], 'g');
-hold off
-grid on; box on
-%Setting graph limits
-xlim([-1 1])
-ylim([-1 1])
-zlim([-1 1])
-for i = 1:length(Viz.x)
-   tic
-   set(h1, 'XData', [0 Viz.x(i,1)], 'YData', [0 Viz.x(i,2)], 'ZData', [0 Viz.x(i,3)]);
-   set(h2, 'XData', [0 Viz.y(i,1)], 'YData', [0 Viz.y(i,2)], 'ZData', [0 Viz.y(i,3)]);
-   set(h3, 'XData', [0 Viz.z(i,1)], 'YData', [0 Viz.z(i,2)], 'ZData', [0 Viz.z(i,3)]);
-   title(['t = ', num2str(Q.tVec(i)), ' sec'])
-   drawnow
-   dt = toc;
-   pause(max((delt/S.oversampFact)-dt,0.001))
-end
-
 %Output results
 [Apogee, apIndex] = max(Q.state.rMat(:,3));
 tApogee = Q.tVec(apIndex);
@@ -137,3 +90,10 @@ fprintf(fileID,'%17s %12f %5s\n','Time to Apogee = ',tApogee, ' [s]');
 fprintf(fileID,'%9s %12f %5s\n','        Apogee = ',Apogee, ' [m]');
 fprintf(fileID,'%15s %12f %6s\n','  Max Velocity = ',vMax, ' [m/s]');
 fclose(fileID);
+
+% Body-Axis Visualization
+S2.tVec = Q.tVec;
+S2.eMat = Q.state.eMat;
+S2.tStep = delt/S.oversampFact;
+S2.bounds=[-1 1 -1 1 -1 1];
+visualizeAxes(S2);
