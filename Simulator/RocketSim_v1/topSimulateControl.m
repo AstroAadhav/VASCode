@@ -31,9 +31,9 @@ pitch = 0*(pi/180);
 yaw = 0*(pi/180);
 S.state0.e = [0 -pi/2+pitch -pi/2+yaw]';
 % Initial velocity of body with respect to I, expressed in I, in m/s
-S.state0.v = [5 0 425]';
+S.state0.v = [0 0 425]';
 % Initial angular rate of body with respect to I, expressed in B, in rad/s
-S.state0.omegaB = [0 0 0]';
+S.state0.omegaB = [0 5 0]';
 % Oversampling factor
 S.oversampFact = 2;
 % Feature locations in the I frame
@@ -66,11 +66,15 @@ xlabel('Time (sec)');
 ylabel('Vertical (m)');
 title('Vertical position of CM'); 
 
+%Plot 3D trajectory
 figure(3)
 plot3(Q.state.rMat(:,1),Q.state.rMat(:,2),Q.state.rMat(:,3))
 box on; grid on
-xlim([-100 100])
-ylim([-100 100])
+xmax = max(max(abs(Q.state.rMat(:,1))), 100);
+ymax = max(max(abs(Q.state.rMat(:,2))), 100);
+graphmax = sqrt(xmax^2 + ymax^2);
+xlim([-graphmax graphmax])
+ylim([-graphmax graphmax])
 % figure(3);clf;
 % psiError = unwrap(n*Q.tVec + pi - Q.state.eMat(:,3));
 % meanPsiErrorInt = round(mean(psiError)/2/pi);
@@ -80,37 +84,47 @@ ylim([-100 100])
 % ylabel('\Delta \psi (rad)');
 % title('Yaw angle error');
 
-% %Plot horizontal position
-% figure(3);clf;
-% hold on
-% plot(Q.state.rMat(:,1), Q.state.rMat(:,2)); 
-% axis equal; grid on; box on;
-% xlabel('X (m)');
-% ylabel('Y (m)');
-% title('Horizontal position of CM with X-Axis Direction');
-
-% % Plot body x-axis direction
-% xDir.Pos = [];
-% j = 1;
-% for i = 1:N*S.oversampFact/(2*Tsim):(Tsim*S.oversampFact/delt)
-%     CM = Q.state.rMat(i,1:2);
-%     RBI = euler2dcm(Q.state.eMat(i,:));
-%     xDir.Pos(j,:) = RBI'*[1;0;0];
-%     xDir.time(j) = Q.tVec(i);
-%     quiver(CM(1), CM(2), xDir.Pos(j,1), xDir.Pos(j,2))
-%     j = j+1;
-% end
-
+%Plot Euler Angles
 figure(4)
 subplot(3,1,1)
 plot(Q.tVec,Q.state.eMat(:,1)); grid on; box on;
-ylabel('Roll')
+ylabel('Body Z')
 subplot(3,1,2)
 plot(Q.tVec,Q.state.eMat(:,2) + pi/2); grid on; box on;
-ylabel('Pitch')
+ylabel('Body Y')
 subplot(3,1,3)
 plot(Q.tVec,Q.state.eMat(:,3) + pi/2); grid on; box on;
-ylabel('Yaw')
+ylabel('Body X')
+
+%Body-Axis Visualization
+for i = 1:length(Q.state.eMat)
+RBI = euler2dcm(Q.state.eMat(i,:));
+Viz.x(i,:) = RBI(1,:);
+Viz.y(i,:) = RBI(2,:);
+Viz.z(i,:) = RBI(3,:);
+end
+figure(5)
+% x-axis = red, y-axis = blue, z-axis = green
+h1 = plot3([0 Viz.x(1,1)], [0 Viz.x(1,2)], [0 Viz.x(1,3)], 'r');
+hold on
+h2 = plot3([0 Viz.y(1,1)], [0 Viz.y(1,2)], [0 Viz.y(1,3)], 'b');
+h3 = plot3([0 Viz.z(1,1)], [0 Viz.z(1,2)], [0 Viz.z(1,3)], 'g');
+hold off
+grid on; box on
+%Setting graph limits
+xlim([-1 1])
+ylim([-1 1])
+zlim([-1 1])
+for i = 1:length(Viz.x)
+   tic
+   set(h1, 'XData', [0 Viz.x(i,1)], 'YData', [0 Viz.x(i,2)], 'ZData', [0 Viz.x(i,3)]);
+   set(h2, 'XData', [0 Viz.y(i,1)], 'YData', [0 Viz.y(i,2)], 'ZData', [0 Viz.y(i,3)]);
+   set(h3, 'XData', [0 Viz.z(i,1)], 'YData', [0 Viz.z(i,2)], 'ZData', [0 Viz.z(i,3)]);
+   title(['t = ', num2str(Q.tVec(i)), ' sec'])
+   drawnow
+   dt = toc;
+   pause(max((delt/S.oversampFact)-dt,0.001))
+end
 
 %Output results
 [Apogee, apIndex] = max(Q.state.rMat(:,3));

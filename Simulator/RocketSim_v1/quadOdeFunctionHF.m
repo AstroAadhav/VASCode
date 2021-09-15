@@ -93,8 +93,6 @@ elseif mach>2.09
 else
     Cnfit = P.quadParams.Cnfit(1,2:end);
 end
-%Determine pitch and yaw to calculate Cn from the fit
-
 
 % Calculate aerodynamic forces
 epsilon_vI = 1e-3;
@@ -106,14 +104,11 @@ if(norm(vI) > epsilon_vI)
   dP = 0.5*P.quadParams.Ad*rho*fd;
   da = dP*Cd;
   vBu = RBI*vIu;
+  %Determine pitch and yaw to calculate Cn from the fit
   yaw = atan2(vBu(2), vBu(1));
   pitch = atan2(vBu(3), sqrt(vBu(1)^2 + vBu(2)^2));
   Cn = polyval(Cnfit, abs([0;pitch;yaw]));
-  for i = 1:3
-      if Cn(i)<0
-          Cn(i)=0;
-      end
-  end
+  Cn(Cn<0) = 0;
   dn = dP*Cn.*[0;pitch;-yaw];
 end
 % yawd = yaw*(180/pi)
@@ -135,8 +130,8 @@ NBd = -(0.5*P.quadParams.Ad*rho*norm(vI)).*Cn*(P.quadParams.StaticMargin^2).*ome
 NB = NB + NBc + NBd;
 
 % Error
-zIstark = [0;1;0];
 xIstark = [0;0;1];
+zIstark = [0;1;0];
 b = cross(zIstark,xIstark);
 b = b/norm(b);
 a = cross(b,zIstark);
