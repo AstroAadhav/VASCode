@@ -3,10 +3,10 @@ Simulator and controller code for a Vertical Active Stabilization (VAS) project 
 
 Project started Fall 2020, repository created Spring 2021 by the VAS Electronics subteam.
 
-Spring 2021 Electronics Team Members:
- - Francis Lara
- - Dylan Caruso
- - Joseph Florez
+Fall 2021 Electronics Team Members:
+ - Pranav Tiwari
+ - Jimmy Xin
+ - Darren Au
  - Tyler Dean
 
 Simulator:
