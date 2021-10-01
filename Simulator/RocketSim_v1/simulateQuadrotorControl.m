@@ -121,12 +121,13 @@ for kk=1:N-1
   statek.omegaB = Xk(16:18);
   Stc.statek = statek;
   Sac.statek = statek;
+  Svc.statek = statek;
   distVeck = S.distMat(kk,:)';
   % Call trajectory and attitude controllers
   [Fk,Rac.zIstark] = trajectoryController(Rtc,Stc,P);
   NBk = attitudeController(Rac,Sac,P);
   % Convert commanded Fk and NBk to commanded voltages
-  eaVeck = voltageConverter(Fk,NBk,P);
+  eaVeck = voltageConverter(Fk,NBk,Svc,P);
   tspan = [R.tVec(kk):dtOut:R.tVec(kk+1)]';
   [tVeck,XMatk] = ...
       ode45(@(t,X) quadOdeFunctionHF(t,X,eaVeck,distVeck,P),tspan,Xk);

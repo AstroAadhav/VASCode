@@ -20,21 +20,23 @@ quadParams.rotor_loc  =  ...
           -1  1  1 -1; ...
            0  0  0  0];
        
-%%Rocket Parameters%%     
-% Mass of the quad, in kg
-quadParams.m = 25;%0.78;
+%%Rocket Parameters (w/no canards)%%     
+% Mass of the rocket, in kg
+quadParams.m = 25;% estimate;
 % The quad's moment of inertia, expressed in the body frame, in kg-m^2
 % quadParams.Jq = diag(1e-9*[75304350; 76844293937; 76844293929]); From
 % mass properties given in Teams
-quadParams.Jq = diag(1e-7*[334841.56; 123437064.31; 123437064.31]); % From SolidWorks, assuming 25km mass evenly dist.
-% The circular-disk-equivalent area of the quad's body, in m^2
+% From SolidWorks, assuming 25km mass evenly dist.
+quadParams.Jq = diag(1e-7*[334841.56; 123437064.31; 123437064.31]);
+% The circular-disk-equivalent area of the rocket's body, in m^2
 quadParams.Ad = 0.0083853114; %2.034in diameter
-% The quad's coefficient of axial force at Mach 0.01:2.09 (unitless)
+% The rocket's coefficient of axial force at Mach 0.01:2.09 (unitless)
 quadParams.Cd = readmatrix('CA_avg.txt');
 % The quad's coefficient of normal force at Mach 0.01:2.09 (unitless)
 quadParams.Cnfit = readmatrix('CN_fit.txt');
 % The quad's static margin (distance from cp to cg) in m
 quadParams.StaticMargin = 0.13325;
+
 
 %%Canard Parameters%%
 % Canard axial coefficient

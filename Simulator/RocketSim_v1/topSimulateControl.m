@@ -4,7 +4,7 @@
 clear all; clc;
 tic
 % Total simulation time, in seconds
-Tsim = 13.69;
+Tsim = 20;
 % Update interval, in seconds
 delt = 0.005;
 % Time vector, in seconds 
