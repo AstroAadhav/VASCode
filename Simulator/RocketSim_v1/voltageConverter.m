@@ -47,30 +47,76 @@ function [eak] = voltageConverter(Fk,NBk,S,P)
 % Author:
 %+==============================================================================+  
 
-% Determine maximum force that can be applied by any rotor
-omegaMax = min(P.quadParams.cm) * P.quadParams.eamax; 
-FMax = min(P.quadParams.kF)*(omegaMax^2);
+% Maximum canard angular displacement
+thetaMax = 10*(pi/180); % 10 degrees cw or ccw, converted to radians
+
+% Extract quantities from state vector
+rI = S.statek.rI;
+vI = S.statek.vI;
+RBI = S.statek.RBI;
+xI = RBI(1,:)'; %body x-axis, expressed in inertial coordinates
+
+% Determine density and speed o sound
+[rho,~,a] = calcAtmoProp(rI(3)/P.constants.distConv);
+rho = rho*P.constants.denConv; %Convert density from imperial to SI
+a = a*P.constants.distConv; %Convert speed from imperial to SI
+mach = abs(norm(vI)/a);
+
+% Determine Cn polynomial fit from sim data based on Mach Number
+if and(mach>0.01, mach<2.09)
+    Cnfit = P.quadParams.Cnfit(abs(mach-P.quadParams.Cnfit(:,1))<0.005,2:end);
+elseif mach>2.09
+    Cnfit = P.quadParams.Cnfit(end,2:end);
+else
+    Cnfit = P.quadParams.Cnfit(1,2:end);
+end
+
+% Calculate aerdynamic values
+epsilon_vI = 1e-3;
+dP = 0;
+if(norm(vI) > epsilon_vI)
+  vIu = vI/norm(vI);
+  fd = (xI'*vIu)*norm(vI)^2;
+  dP = 0.5*P.quadParams.Ad*rho*fd;
+end
 
 % Populate conversion matrix
-kCVec = P.quadParams.kN./P.quadParams.kF;
-G = [ones(1,4); 
-     P.quadParams.rotor_loc(2,:);
-     -P.quadParams.rotor_loc(1,:);
-     -(kTVec').*P.quadParams.omegaRdir];
+K = [-2*(P.quadParams.SMc) 0;
+     0 2*(P.quadParams.SMc)];
+G = dP*K;
 GInv = inv(G);
 
-% Apply non-negative force and saturation constraints
-beta = 0.9;
-Fks = min(Fk,4*beta*FMax);
-alpha = 1;
+% Convert Torque in body-frame to canard-frame (+45 deg rotation about xB)
 NBk2 = rotationMatrix([1;0;0],pi/4)*NBk;
-FVec = GInv*[Fks;alpha*NBk2];
-while(max(FVec) > FMax)
-  alpha = 0.99*alpha;
-  FVec = GInv*[Fks;alpha*NBk2];
-end
-FVec(FVec < 0) = 0;
 
-% Convert force to voltage
-omegaVec = sqrt(FVec./P.quadParams.kF);
-eak = omegaVec./P.quadParams.cm;
+aVec = abs(GInv*[NBk2(2:3,1)]);
+% Determine angular displacement from relationship (quadratic if Cn vs alpha is linear)
+theta = zeros(length(aVec),1);
+for i = 1:length(aVec)
+    poly = [Cnfit,-aVec(i)]; % Coefficient of quadratic polynomial
+    q = roots(poly);
+    p = min(q(q>0),thetaMax); % 0<theta<thetaMax
+    if isreal(p(1)) % Set to 0 if the roots are complex
+        theta(i) = p(1);
+    else
+        theta(i) = 0;
+    end
+    if norm(vI)<50
+        theta(i) = 0;
+    end
+end
+% Current control scheme has canards on opposite sides have the same
+% angular displacement to reduce roll and simplify calculation
+% theta = [theta1; theta2]
+% theta1 = displacement for odd-numbered canards (1, 3)
+% theta2 = displacement for even-numbered canards (2, 4)
+% Use the sign of NBk2 to determine whether the displacement is CW or CCW
+thetac = zeros(4,1);
+thetac(1) = sign(NBk2(2))*theta(1);
+thetac(2) = sign(NBk2(3))*theta(2);
+thetac(3) = -thetac(1);
+thetac(4) = -thetac(2);
+
+% Convert angular displacement to voltage
+% omegaVec = sqrt(FVec./P.quadParams.kF);
+eak = thetac*(180/pi);%omegaVec./P.quadParams.cm;

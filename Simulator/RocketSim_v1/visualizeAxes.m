@@ -54,6 +54,7 @@ if or(str == 'Y', str == 'y')
     h3 = plot3([0 P.z(1,1)], [0 P.z(1,2)], [0 P.z(1,3)], 'g');
     hold off
     grid on; box on
+    legend('x-axis', 'y-axis', 'z-axis', 'location', 'southwest')
     % Setting graph limits
     axis(S.bounds)
     % Changing body axis unit vectors

@@ -4,7 +4,7 @@
 clear all; clc;
 tic
 % Total simulation time, in seconds
-Tsim = 20;
+Tsim = 40;
 % Update interval, in seconds
 delt = 0.005;
 % Time vector, in seconds 
@@ -22,18 +22,18 @@ R.xIstar = diag(1./vecnorm(R.rIstar'))*(-R.rIstar);
 
 % Matrix of thrust forces acting on the body, in Newtons, expressed in B
 Tcurve = load('Cesaroni 15227N2501-P Thrust Points.txt');
-S.distMat = 0*[interpThrust(tVec, Tcurve), zeros(N,1), zeros(N,1)];
+S.distMat = 1*[interpThrust(tVec, Tcurve), zeros(N,1), zeros(N,1)];
 
 % Initial position in m
-S.state0.r = [1 1 1]';
+S.state0.r = [1 1 100]';
 % Initial attitude expressed as Euler angles, in radians
-pitch = 0*(pi/180);
+pitch = 45*(pi/180);
 yaw = 0*(pi/180);
 S.state0.e = [0 -pi/2+pitch -pi/2+yaw]';
 % Initial velocity of body with respect to I, expressed in I, in m/s
-S.state0.v = [0 0 425]';
+S.state0.v = [0 0 5]';
 % Initial angular rate of body with respect to I, expressed in B, in rad/s
-S.state0.omegaB = [0 1 0]';
+S.state0.omegaB = [0 0 0]';
 % Oversampling factor
 S.oversampFact = 2;
 % Feature locations in the I frame
@@ -79,6 +79,21 @@ subplot(3,1,3)
 plot(Q.tVec,Q.state.eMat(:,3) + pi/2); grid on; box on;
 ylabel('Body X')
 
+% Mach Graph
+figure(5)
+mach = zeros(length(Q.tVec),1);
+for i = 1:length(Q.tVec)
+[rho,~,a] = calcAtmoProp(Q.state.rMat(i,3)/constants.distConv);
+rho = rho*constants.denConv; %Convert density from imperial to SI
+a = a*constants.distConv; %Convert speed from imperial to SI
+mach(i) = abs(norm(Q.state.vMat(i,:))/a);
+end
+plot(Q.tVec, mach, 'r')
+title('Mach Graph')
+xlabel('Time [s]')
+ylabel('Mach#')
+box on; grid on;
+
 %Output results
 [Apogee, apIndex] = max(Q.state.rMat(:,3));
 tApogee = Q.tVec(apIndex);
@@ -87,8 +102,8 @@ vMax = max(vecnorm(Q.state.vMat,2,2));
 vMax = vMax/constants.distConv;
 fileID = fopen('SimOut.txt','w');
 fprintf(fileID,'%17s %12f %5s\n','Time to Apogee = ',tApogee, ' [s]');
-fprintf(fileID,'%9s %12f %5s\n','        Apogee = ',Apogee, ' [m]');
-fprintf(fileID,'%15s %12f %6s\n','  Max Velocity = ',vMax, ' [m/s]');
+fprintf(fileID,'%9s %12f %5s\n','        Apogee = ',Apogee, ' [ft]');
+fprintf(fileID,'%15s %12f %6s\n','  Max Velocity = ',vMax, ' [ft/s]');
 fclose(fileID);
 
 % Body-Axis Visualization

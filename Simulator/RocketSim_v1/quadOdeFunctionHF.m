@@ -74,9 +74,9 @@ xI = RBI(1,:)'; %body x-axis, expressed in inertial coordinates
 [rho,~,a] = calcAtmoProp(X(3)/P.constants.distConv);
 rho = rho*P.constants.denConv; %Convert density from imperial to SI
 a = a*P.constants.distConv; %Convert speed from imperial to SI
+mach = abs(norm(vI)/a);
 
 % Determine CD from simulation data based on Mach number
-mach = abs(norm(vI)/a);
 if and(mach>0.01, mach<2.09)
     Cd = P.quadParams.Cd(abs(mach-P.quadParams.Cd(:,1))<0.005,2);
 elseif mach>2.09
@@ -85,7 +85,7 @@ elseif mach<0.01
     Cd = P.quadParams.Cd(1,2);
 end
 
-% Determine Cn 2nd order polynomial fit from sim data based on Mach Number
+% Determine Cn polynomial fit from sim data based on Mach Number
 if and(mach>0.01, mach<2.09)
     Cnfit = P.quadParams.Cnfit(abs(mach-P.quadParams.Cnfit(:,1))<0.005,2:end);
 elseif mach>2.09
@@ -142,6 +142,5 @@ eE = [RE(2,3) - RE(3,2); RE(3,1) - RE(1,3); RE(1,2) - RE(2,1)];
 
 omegaBdot = inv(Jq)*(NB - omegaBx*Jq*omegaB);
 omegaVecdot = (eaVec.*P.quadParams.cm - omegaVec)./P.quadParams.taum;
-
 % Load the output vector
 Xdot = [rIdot;vIdot;RBIdot(:);omegaBdot;omegaVecdot];
