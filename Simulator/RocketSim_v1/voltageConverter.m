@@ -119,4 +119,4 @@ thetac(4) = -thetac(2);
 
 % Convert angular displacement to voltage
 % omegaVec = sqrt(FVec./P.quadParams.kF);
-eak = thetac*(180/pi);%omegaVec./P.quadParams.cm;
+eak = thetac*(180/pi); %currently set to display canard displacement in degrees, not voltage

@@ -13,7 +13,7 @@ This guide details how to set up the initial conditions, run a simulation, and w
 	     -Currently taken from RasAero CFD simulation. The TestCoeff.m script loads the data from the FCD rocket RasAero coefficients excel spreadsheet and turns the data into a form that the simulator can use.
 	     -Currently the Cd data at each angle of attack is averaged at each Mach# to get one Mach# vs Cd curve, up to Mach 2 (limit for this rocket). This is because small angles of attack hahave a weak effect on the Cd
 	-quadParams.Cnfit = coefficient of normal force quadratic fit: determined by same method as axial coefficient
-	     -Since angle of attack and Mach# greatly effect on the Cn, a cirve is fitted at each Mach# to get a relationship between AoA and Cn. Quadratic fit was chosen so that the Cn would increase dramatically at higher AoAs. Linear is more valid at small AoAs. May try exponential fit for better accuracy
+	     -Since angle of attack and Mach# greatly effect on the Cn, a curve is fitted at each Mach# to get a relationship between AoA and Cn. Quadratic fit was chosen so that the Cn would increase dramatically at higher AoAs. Linear is more valid at small AoAs. May try exponential fit for better accuracy
 	     -Each row in the Cnfit matrix contains the coefficients of a quadratic funtion that relate the AoA to the Cn at the Mach# for that row. Starts at M = 0.01.
 	-quadParams.StaticMargin = static margin: absolute distance from the center of mass (CM) and the center of pressure (CP). Aerodynamic forces are chosen to act through the CP. abs(Xcm - Xcp)
 	     -In OpenRocket and other programs, can be determined from the "Stability" parameter which is the static margin divided by the max diameter of the rocket and is measured in "calibers". For example, a rocket might have a stability of "2 cal".
@@ -37,19 +37,19 @@ This guide details how to set up the initial conditions, run a simulation, and w
 	-S.state0.r = initial position
 	-S.state0.e = initial attitude, given in Euler angles. Can set an initial launch angle with yaw and pitch.
 	-S.state0.v = initial velocity: set to 0 to simulate from launch. Can give the rocket an initial velocity to check behavior in-flight. Be sure to set the thrust to 0 if evaluating after burnout.
-	-S.state0.omegaB = initial angular velocity: currently unsure if [a b c]' angular vel corresponds to inertial [x y z]' axes or body [x y z]' axes. Results only makes sense if [a 0 0]' is given. Need to determine if dynamics are correct
+	-S.state0.omegaB = initial angular velocity about the body-axes. wb = [a b c]' which corresponds to ang vel about the [x y z]' body axes
 	-S.oversampFact = oversampling factor: further divides the time step by this factor. Reduces error by calculating the state at an intermediate time step. For example, with a factor of 2 instead of calculating the state from T=10:10.005s, it calculates from T=10:10.0025 then T=10.0025:10.005s. Note that the intermediate state is not recorded.
 	-S.rXIMat = feature locations: important for camera simulation, not relevent here
 	-"P" structure contains all of the rocket, sensor, environmental, and constant parameters
 
 3. Run the simulation by pressing the green play buttion at the top in the editor tab
-     -"Q" structure contains the state of the rocket at every point of the simulation and is filled throughout the simulation. Data analysis uses this "Q" structure
+     -"Q" structure contains the state of the rocket at every point of the simulation and is filled throughout the simulation. Data analysis uses this "Q" structure.
      -The rest of the script displays the results of the simulation and outputs some metrics to SimOut.txt. This file is overwritten each time so close it before every run.
 
 4. Evaluate the performance of the rocket
      -If the trajectory or attitude of the rocket seem fishy, check your initial conditions and parameters.
      -Verify if altitude and max velocity match that of other simulations
-     -If the initial conditions and parameters are fine but it still seems erroneous, then the differential equations are likely erroneous. Proceed to the next step
+     -If the initial conditions and parameters are fine but performance still seems erroneous, then the differential equations are likely erroneous. Proceed to the next step
 
 5. Modify the rocket dynamics functions
      -Open quadOdeFunctionHF.m
