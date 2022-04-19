@@ -47,7 +47,7 @@ function [eak] = voltageConverter(Fk,NBk,S,P)
 % Author:
 %+==============================================================================+  
 
-% Maximum canard angular displacement
+% Define maximum canard angular displacement
 thetaMax = 10*(pi/180); % 10 degrees cw or ccw, converted to radians
 
 % Extract quantities from state vector
@@ -71,7 +71,7 @@ else
     Cnfit = P.quadParams.Cnfit(1,2:end);
 end
 
-% Calculate aerdynamic values
+% Calculate aerodynamic values
 epsilon_vI = 1e-3;
 dP = 0;
 if(norm(vI) > epsilon_vI)

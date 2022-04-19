@@ -102,23 +102,26 @@ if(norm(vI) > epsilon_vI)
   vIu = vI/norm(vI);
   fd = (xI'*vIu)*norm(vI)^2;
   dP = 0.5*P.quadParams.Ad*rho*fd;
-  da = dP*Cd;
+  da = dP*Cd; %axial force
   vBu = RBI*vIu;
   %Determine pitch and yaw to calculate Cn from the fit
   yaw = atan2(vBu(2), vBu(1));
   pitch = atan2(vBu(3), sqrt(vBu(1)^2 + vBu(2)^2));
   Cn = polyval(Cnfit, abs([0;pitch;yaw]));
   Cn(Cn<0) = 0;
-  dn = dP*Cn.*[0;pitch;-yaw];
+  dn = dP*Cn.*[0;pitch;-yaw]; %normal force
 end
 % yawd = yaw*(180/pi)
 % pitchd = pitch*(180/pi)
 % Test = sqrt(0.5*rho*P.quadParams.Ad*Cn)*(P.quadParams.StaticMargin^1.5)
 
+%%Note: Canard forces not taken into account yet%%
+%Would need to be summed with da and dn
+
 % Find derivatives of state elements
 rIdot = vI;
 % vIdot = ([0;0;-mq*gE] + RBI'*sum(FMat,2) + RBI'*distVec - da*vIu)/mq;
-vIdot = ([0;0;-mq*gE] + RBI'*sum(FMat,2) + RBI'*distVec - RBI'*([da;0;0]+dn))/mq;
+vIdot = ([0;0;-mq*gE] + RBI'*sum(FMat,2) + RBI'*(distVec - [da;0;0]+dn))/mq;
 RBIdot = -omegaBx*RBI;
 NB = sum(NMat,2);
 

@@ -50,6 +50,8 @@ P.sensorParams = sensorParams;
 Q = simulateQuadrotorControl(R,S,P);
 toc
 
+
+%%Plot Results%%
 %Plot Altitude
 figure(2);clf;
 plot(Q.tVec,Q.state.rMat(:,3)); grid on; box on;
@@ -94,7 +96,7 @@ xlabel('Time [s]')
 ylabel('Mach#')
 box on; grid on;
 
-%Output results
+% Output results to file
 [Apogee, apIndex] = max(Q.state.rMat(:,3));
 tApogee = Q.tVec(apIndex);
 Apogee = Apogee/constants.distConv;

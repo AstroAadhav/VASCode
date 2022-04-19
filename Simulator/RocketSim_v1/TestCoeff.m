@@ -10,10 +10,10 @@ for i = 1:length(alpha) %Separate the Data into seperate Cells, based on alpha
 end
 
 %MATLAB Notation: cell{i} refers to the ith member of the cell
-%                 If that ith member is a matrix, then
-%                    cell{i}(j,k) refers to row j and column k in the matrix
-%                    stored in the ith member of the cell
-%                 In general, most data types can be stored in a cell (e.g. strings, characters, vectors, integers, etc.)
+%       If that ith member is a matrix, then
+%          cell{i}(j,k) refers to row j and column k in the matrix
+%          stored in the ith member of the cell
+%       In general, most data types can be stored in a cell (e.g. strings, characters, vectors, integers, etc.)
 
 %Compare CA with Power on vs Power off
 CAOn= [DataCell{1}(:,1), DataCell{1}(:,6), DataCell{2}(:,6), DataCell{3}(:,6)];
